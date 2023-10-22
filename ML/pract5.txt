@@ -1,0 +1,267 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+%matplotlib inline
+import warnings
+warnings.filterwarnings('ignore')
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn import metrics
+
+df=pd.read_csv('emails.csv')
+df.shape
+df.head()
+df.columns
+df.info()
+df.isnull().sum()
+
+df.drop(['Email No.'],axis=1,inplace=True)
+X = df.drop(['Prediction'],axis = 1)
+y = df['Prediction']
+
+from sklearn.preprocessing import scale
+X = scale(X)
+# split into train and test
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 42)
+
+from sklearn.neighbors import KNeighborsClassifier
+knn = KNeighborsClassifier(n_neighbors=6)
+knn.fit(X_train, y_train)
+y_pred = knn.predict(X_test)
+
+print("Prediction",y_pred)
+print("KNN accuracy = ",metrics.accuracy_score(y_test,y_pred))
+print("Confusion matrix",metrics.confusion_matrix(y_test,y_pred))
+
+# cost C = 1
+model = SVC(C = 1)
+# fit
+model.fit(X_train, y_train)
+# predict
+y_pred = model.predict(X_test)
+
+metrics.confusion_matrix(y_true=y_test, y_pred=y_pred)
+print("SVM accuracy = ",metrics.accuracy_score(y_test,y_pred))
+
+from sklearn.svm import SVC
+from sklearn.svm import LinearSVC
+from sklearn.metrics import accuracy_score
+import math
+import time
+
+start = time.time()
+model = SVC(kernel='poly',C=2)
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+acc = accuracy_score(y_test, pred)
+print(round(acc*100,1), '%')
+end = time.time()
+
+print(f"{end - start:.5f} sec")
+
+start = time.time()
+model = SVC(kernel='rbf',C=2)
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+acc = accuracy_score(y_test, pred)
+print(round(acc*100,1), '%')
+end = time.time()
+
+print(f"{end - start:.5f} sec")
+
+start = time.time()
+model = SVC(kernel='sigmoid',C=2)
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+acc = accuracy_score(y_test, pred)
+print(round(acc*100,1), '%')
+end = time.time()
+
+print(f"{end - start:.5f} sec")
+
+start = time.time()
+model = LinearSVC(C=2)
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+acc = accuracy_score(y_test, pred)
+print(round(acc*100,1), '%')
+end = time.time()
+
+print(f"{end - start:.5f} sec")
+
+from sklearn.preprocessing import MinMaxScaler
+x = df.drop('Prediction', axis=1)
+y = df['Prediction']
+
+scaler=MinMaxScaler()
+x=scaler.fit_transform(x)
+
+X_train, X_test, y_train, y_test = train_test_split(x,y , test_size = 0.2, random_state = 100)
+
+
+
+
+print('======poly======')
+start = time.time()
+model = SVC(kernel='poly',C=3)
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+acc = accuracy_score(y_test, pred)
+print(round(acc*100,1), '%')
+end = time.time()
+
+print(f"{end - start:.5f} sec")
+print('=======rbf=======')
+
+start = time.time()
+model = SVC(kernel='rbf',C=3)
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+acc = accuracy_score(y_test, pred)
+print(round(acc*100,1), '%')
+end = time.time()
+
+print(f"{end - start:.5f} sec")
+print('=====sigmoid=====')
+
+start = time.time()
+model = SVC(kernel='sigmoid',C=3)
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+acc = accuracy_score(y_test, pred)
+print(round(acc*100,1), '%')
+end = time.time()
+
+print(f"{end - start:.5f} sec")
+print('=====LinearSVC=====')
+
+start = time.time()
+model = LinearSVC(C=3)
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+acc = accuracy_score(y_test, pred)
+print(round(acc*100,1), '%')
+end = time.time()
+
+print(f"{end - start:.5f} sec")
+
+
+
+from sklearn.preprocessing import RobustScaler
+x = df.drop('Prediction', axis=1)
+y = df['Prediction']
+
+scaler=RobustScaler()
+x=scaler.fit_transform(x)
+
+X_train, X_test, y_train, y_test = train_test_split(x,y , test_size = 0.2, random_state = 100)
+
+
+
+print('======poly======')
+start = time.time()
+model = SVC(kernel='poly')
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+acc = accuracy_score(y_test, pred)
+print(round(acc*100,1), '%')
+end = time.time()
+
+print(f"{end - start:.5f} sec")
+print('=======rbf=======')
+
+start = time.time()
+model = SVC(kernel='rbf',C=2)
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+acc = accuracy_score(y_test, pred)
+print(round(acc*100,1), '%')
+end = time.time()
+
+print(f"{end - start:.5f} sec")
+print('=====sigmoid=====')
+
+start = time.time()
+model = SVC(kernel='sigmoid')
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+acc = accuracy_score(y_test, pred)
+print(round(acc*100,1), '%')
+end = time.time()
+
+print(f"{end - start:.5f} sec")
+print('=====LinearSVC=====')
+
+start = time.time()
+model = LinearSVC(C=2)
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+acc = accuracy_score(y_test, pred)
+print(round(acc*100,1), '%')
+end = time.time()
+
+print(f"{end - start:.5f} sec")
+
+
+from sklearn.preprocessing import StandardScaler
+x = df.drop('Prediction', axis=1)
+y = df['Prediction']
+
+scaler=StandardScaler()
+x=scaler.fit_transform(x)
+
+X_train, X_test, y_train, y_test = train_test_split(x,y , test_size = 0.2, random_state = 100)
+
+
+
+
+print('======poly======')
+start = time.time()
+model = SVC(kernel='poly')
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+acc = accuracy_score(y_test, pred)
+print(round(acc*100,1), '%')
+end = time.time()
+
+print(f"{end - start:.5f} sec")
+print('=======rbf=======')
+
+start = time.time()
+model = SVC(kernel='rbf')
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+acc = accuracy_score(y_test, pred)
+print(round(acc*100,1), '%')
+end = time.time()
+
+print(f"{end - start:.5f} sec")
+print('=====sigmoid=====')
+
+start = time.time()
+model = SVC(kernel='sigmoid')
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+acc = accuracy_score(y_test, pred)
+print(round(acc*100,1), '%')
+end = time.time()
+
+print(f"{end - start:.5f} sec")
+print('=====LinearSVC=====')
+
+start = time.time()
+model = LinearSVC()
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+acc = accuracy_score(y_test, pred)
+print(round(acc*100,1), '%')
+end = time.time()
+
+print(f"{end - start:.5f} sec")
+
+
+
+
+
+

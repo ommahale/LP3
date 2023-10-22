@@ -1,0 +1,45 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+data = pd.read_csv('diabetes.csv')
+data.head()
+data.corr()['Outcome']
+sns.heatmap(data.corr(), annot=True)
+
+X = data.drop('Outcome', axis=1)
+y = data['Outcome']
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+
+scaler = StandardScaler()
+knn = KNeighborsClassifier()
+
+operations = [('scaler', scaler), ('knn', knn)]
+
+from sklearn.pipeline import Pipeline
+pipe = Pipeline(operations)
+
+from sklearn.model_selection import GridSearchCV
+k_values = list(range(1, 20))
+
+param_grid = {'knn__n_neighbors':k_values}
+
+full_classifier = GridSearchCV(pipe, param_grid, cv=5, scoring='accuracy')
+full_classifier.fit(X_train, y_train)
+full_classifier.best_estimator_.get_params()
+y_pred = full_classifier.predict(X_test)
+
+from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
+
+accuracy_score(y_test, y_pred)
+confusion_matrix(y_test, y_pred)
+print(classification_report(y_test, y_pred))
+
+
