@@ -1,0 +1,113 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib as plt
+
+data=pd.read_csv("uber.csv")
+
+data
+
+data.head()
+
+data.info()
+
+data.columns
+
+data=data.drop(['Unnamed: 0'], axis=1)
+
+data=data.drop(['key'], axis=1)
+
+data.head()
+
+data.isnull().sum()
+
+data['dropoff_longitude'].fillna(value=data['dropoff_longitude'].mean(), inplace=True)
+data['dropoff_latitude'].fillna(value=data['dropoff_latitude'].median(), inplace=True)
+
+data.isnull().sum()
+
+data.pickup_datetime=pd.to_datetime(data.pickup_datetime, errors='coerce')
+
+data= data.assign(hour = data.pickup_datetime.dt.hour,
+             day= data.pickup_datetime.dt.day,
+             month = data.pickup_datetime.dt.month,
+             year = data.pickup_datetime.dt.year,
+             dayofweek = data.pickup_datetime.dt.dayofweek)
+
+data=data.drop(['pickup_datetime'], axis=1)
+
+data.plot(kind = "box",subplots = True,layout = (7,2),figsize=(15,20)) 
+
+#Using the InterQuartile Range to fill the values
+def remove_outlier(data1 , col):
+    Q1 = data1[col].quantile(0.25)
+    Q3 = data1[col].quantile(0.75)
+    IQR = Q3 - Q1
+    lower_whisker = Q1-1.5*IQR
+    upper_whisker = Q3+1.5*IQR
+    data[col] = np.clip(data1[col] , lower_whisker , upper_whisker)
+    return data1
+
+def treat_outliers_all(data1 , col_list):
+    for c in col_list:
+        data1 = remove_outlier(data , c)
+    return data1
+
+data=treat_outliers_all(data,data.iloc[: , 0::])
+
+data.plot(kind = "box",subplots = True,layout = (7,2),figsize=(15,20))
+
+!pip install haversine 
+
+import haversine as hs
+
+travel_dist = []
+for pos in range(len(data['pickup_longitude'])):
+        long1,lati1,long2,lati2 = [data['pickup_longitude'][pos],data['pickup_latitude'][pos],data['dropoff_longitude'][pos],data['dropoff_latitude'][pos]]
+        loc1=(lati1,long1)
+        loc2=(lati2,long2)
+        c = hs.haversine(loc1,loc2)
+        travel_dist.append(c)
+
+print(travel_dist)
+data['dist_travel_km'] = travel_dist
+data.head()
+
+x = data[['pickup_longitude','pickup_latitude','dropoff_longitude','dropoff_latitude','passenger_count','hour','day','month','year','dayofweek','dist_travel_km']]
+y = data['fare_amount']
+
+x
+y
+
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+X_train,X_test,y_train,y_test = train_test_split(x,y,test_size = 0.33)
+
+from sklearn.linear_model import LinearRegression
+regression = LinearRegression()
+
+regression.fit(X_train,y_train)
+
+regression.intercept_ #To find the linear intercept
+
+regression.coef_ #To find the linear coeeficient
+
+pred=regression.predict(X_test)
+pred
+
+from sklearn.metrics import r2_score
+
+r2_score(y_test,pred)
+
+MSE = mean_squared_error(y_test,pred)
+MSE
+RMSE = np.sqrt(MSE)
+RMSE
+
+from sklearn.ensemble import RandomForestRegressor
+rf.fit(X_train,y_train)
+pred = rf.predict(X_test)
+pred
+
+R=r2_score(y_test,pred)
+MSE = mean_squared_error(y_test,pred)
